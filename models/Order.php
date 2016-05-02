@@ -110,4 +110,14 @@ class Order extends \yii\db\ActiveRecord
         $names = self::getStatusNames();
         return isset($names[$this->status]) ? $names[$this->status] : '';
     }
+
+    public function isOwn()
+    {
+        return $this->recipient_id == Yii::$app->user->id;
+    }
+    
+    public function isEditable()
+    {
+        return $this->status == self::STATUS_NEW;
+    }    
 }

@@ -1,10 +1,9 @@
-<?php
-
-namespace app\controllers;
+<?php namespace app\controllers;
 
 use Yii;
 use app\models\Order;
 use app\models\OrderSearch;
+use app\components\PaymentProcessor;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -15,6 +14,7 @@ use yii\filters\AccessControl;
  */
 class OrderController extends Controller
 {
+
     /**
      * @inheritdoc
      */
@@ -25,6 +25,8 @@ class OrderController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'pay' => ['POST'],
+                    'decline' => ['POST'],
                 ],
             ],
             'access' => [
@@ -35,10 +37,10 @@ class OrderController extends Controller
                         'roles' => ['@'],
                     ],
                 ],
-            ],            
+            ],
         ];
     }
-    
+
     /**
      * Lists all Order models.
      * @return mixed
@@ -49,8 +51,8 @@ class OrderController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -62,7 +64,7 @@ class OrderController extends Controller
     public function actionView($id)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+                'model' => $this->findModel($id),
         ]);
     }
 
@@ -80,7 +82,7 @@ class OrderController extends Controller
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
-                'model' => $model,
+                    'model' => $model,
             ]);
         }
     }
@@ -99,7 +101,7 @@ class OrderController extends Controller
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('update', [
-                'model' => $model,
+                    'model' => $model,
             ]);
         }
     }
@@ -131,5 +133,37 @@ class OrderController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    public function actionPay($id)
+    {
+        $order = Order::findOne([
+                'id' => $id,
+                'payer_id' => Yii::$app->user->id,
+                'status' => Order::STATUS_NEW
+        ]);
+
+        if (!$order) {
+            throw new NotFoundHttpException('Ордер не найден');
+        }
+
+        PaymentProcessor::payOrder($order);
+        return $this->redirect(['order/index']);
+    }
+
+    public function actionDecline($id)
+    {
+        $order = Order::findOne([
+                'id' => $id,
+                'payer_id' => Yii::$app->user->id,
+                'status' => Order::STATUS_NEW
+        ]);
+
+        if (!$order) {
+            throw new NotFoundHttpException('Ордер не найден');
+        }
+
+        PaymentProcessor::declineOrder($order);
+        return $this->redirect(['order/index']);
     }
 }

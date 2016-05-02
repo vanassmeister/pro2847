@@ -57,9 +57,9 @@ class Payment extends \yii\db\ActiveRecord
             'id' => 'ID',
             'recipient_id' => 'Recipient ID',
             'payer_id' => 'Payer ID',
-            'amount' => 'Amount',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'amount' => 'Сумма',
+            'created_at' => 'Создан',
+            'updated_at' => 'Изменен',
         ];
     }
 

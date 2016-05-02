@@ -41,7 +41,12 @@ class PaymentSearch extends Payment
      */
     public function search($params)
     {
-        $query = Payment::find();
+        $userId = Yii::$app->user->id;
+        
+        // Только платежи "от" и "для" текущего пользователя
+        $query = Payment::find()
+            ->where(['recipient_id' => $userId])
+            ->orWhere(['payer_id' => $userId]);
 
         // add conditions that should always apply here
 

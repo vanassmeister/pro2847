@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use app\models\Order;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\OrderSearch */
@@ -9,6 +10,8 @@ use yii\grid\GridView;
 
 $this->title = 'Счета';
 $this->params['breadcrumbs'][] = $this->title;
+
+$view = $this;
 ?>
 <div class="order-index">
 
@@ -22,8 +25,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
             'id',
             [
                 'label' => 'Получатель',
@@ -32,19 +33,37 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'label' => 'Плательщик',
                 'attribute' => 'payer.name',
-            ],            
-            'amount',
+            ],
+            [
+                'attribute' => 'amount',
+                'content' => function($row) use ($view){
+                    /* @var $row app\models\Order */
+                    $buttons = '';
+                    if(!$row->isOwn() && $row->status == Order::STATUS_NEW) {
+                        $buttons = $view->render('_buttons', ['model' => $row]);
+                    }
+                    
+                    return $row->amount.$buttons;
+                }
+            ],
             [
                 'attribute' => 'status',
                 'value' => function($row) {
                     return $row->getStatusName();
                 }
             ],
-            // 'payment_id',
-            // 'created_at',
-            // 'updated_at',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'visibleButtons' =>[
+                    'update' => function ($model) {
+                        return $model->isOwn() && $model->isEditable();
+                    },
+                    'delete' => function ($model) {
+                        return $model->isOwn() && $model->isEditable();
+                    },                        
+                ],                
+            ],
         ],
     ]); ?>
 </div>

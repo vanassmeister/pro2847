@@ -2,6 +2,7 @@
 
 use Yii;
 use yii\base\Model;
+use Exception;
 
 /**
  * LoginForm is the model behind the login form.
@@ -48,20 +49,23 @@ class LoginForm extends Model
      */
     public function getUser()
     {
-        if ($this->_user === false) {
-            $user = User::findByUsername($this->username);
-            if(!$user) {
-                $user = new User();
-                $user->name = $this->username;
-                
-                if($user->save()) {
-                    $this->_user = $user;
-                } else {
-                    Yii::error("Невозможно сохранить пользователя {$user->name}");
-                }
-            }
+        if ($this->_user) {
+            return $this->_user;
         }
+            
+        $this->_user = User::findByUsername($this->username);
+        if($this->_user) {
+            return $this->_user;
+        }
+        
+        $user = new User();
+        $user->name = $this->username;
 
+        if(!$user->save()) {
+            throw new Exception("Невозможно сохранить пользователя {$user->name}");
+        }
+        
+        $this->_user = $user;
         return $this->_user;
     }
 }

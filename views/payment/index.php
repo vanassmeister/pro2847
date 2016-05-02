@@ -22,16 +22,17 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
             'id',
-            'recipient_id',
-            'payer_id',
+            [
+                'label' => 'Получатель',
+                'attribute' => 'recipient.name',
+            ],
+            [
+                'label' => 'Плательщик',
+                'attribute' => 'payer.name',
+            ], 
             'amount',
-            'created_at',
-            // 'updated_at',
-
-            ['class' => 'yii\grid\ActionColumn'],
+            'created_at:datetime',
         ],
     ]); ?>
 </div>

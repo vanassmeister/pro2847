@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\Payment;
 use app\models\PaymentSearch;
+use app\components\PaymentProcessor;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -76,38 +77,8 @@ class PaymentController extends Controller
     {
         $model = new Payment();
 
-        if ($model->load(Yii::$app->request->post())) {
-            
-            $payer = Yii::$app->user->identity;
-            $model->payer_id = $payer->id;            
-            
-            $recipient = $model->recipient;
-            
-            $transaction = Yii::$app->db->beginTransaction();
-            try {
-                
-                if(!$model->save()) {
-                    throw new Exception('Невозможно сохранить платеж');
-                }
-                
-                $payer->balance -= $model->amount;
-                $recipient->balance += $model->amount;
-                
-                if(!$payer->save(true, ['balance'])) {
-                    throw new Exception('Невозможно сохранить баланс плательщика');
-                }
-
-                if(!$recipient->save(true, ['balance'])) {
-                    throw new Exception('Невозможно сохранить баланс получателя');
-                }
-                
-                $transaction->commit();
-                return $this->redirect(['view', 'id' => $model->id]);
-                
-            } catch (Exception $ex) {
-                Yii::error($ex->getMessage());
-                $transaction->rollBack();
-            }
+        if ($model->load(Yii::$app->request->post()) && PaymentProcessor::processPayment($model)) {
+            $this->redirect(['view', 'id' => $model->id]);
         } 
         
         return $this->render('create', [
