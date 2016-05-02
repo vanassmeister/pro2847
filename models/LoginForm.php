@@ -68,4 +68,12 @@ class LoginForm extends Model
         $this->_user = $user;
         return $this->_user;
     }
+    
+    public function attributeLabels()
+    {
+        return [
+            'username' => 'Имя пользователя',
+            'rememberMe' => 'Запомнить меня'
+        ];
+    }
 }
