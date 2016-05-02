@@ -21,6 +21,9 @@ use Yii;
  */
 class Payment extends \yii\db\ActiveRecord
 {
+    
+    public $recipientName;
+    
     /**
      * @inheritdoc
      */
@@ -41,7 +44,8 @@ class Payment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['recipient_id', 'amount'], 'required'],
+            [['recipientName', 'amount'], 'required'],
+            [['recipientName'], 'string', 'max' => 32],            
             [['recipient_id', 'payer_id'], 'integer'],
             [['amount'], 'number'],
             [['recipient_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['recipient_id' => 'id']],
@@ -55,7 +59,7 @@ class Payment extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'recipient_id' => 'Recipient ID',
+            'recipientName' => 'Получатель',
             'payer_id' => 'Payer ID',
             'amount' => 'Сумма',
             'created_at' => 'Создан',

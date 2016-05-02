@@ -41,7 +41,10 @@ class OrderSearch extends Order
      */
     public function search($params)
     {
-        $query = Order::find();
+        $userId = Yii::$app->user->id;        
+        $query = Order::find()
+            ->where(['recipient_id' => $userId])
+            ->orWhere(['payer_id' => $userId]);
 
         // add conditions that should always apply here
 

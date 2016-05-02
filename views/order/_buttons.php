@@ -13,7 +13,7 @@ echo ' ';
 $payForm = ActiveForm::begin([
     'action' => Url::toRoute(['order/pay', 'id' => $model->id]), 
     'method' => 'post',
-    'options' => ['class' => 'order-form']
+    'options' => ['class' => 'order-buttons-form']
     
 ]);
 echo Html::submitButton('Оплатить', ['class' => 'btn btn-success btn-xs']);
@@ -22,7 +22,7 @@ echo ' ';
 $declineForm = ActiveForm::begin([
     'action' => Url::toRoute(['order/decline', 'id' => $model->id]), 
     'method' => 'post',
-    'options' => ['class' => 'order-form']
+    'options' => ['class' => 'order-buttons-form']
 ]);
 echo Html::submitButton('Отклонить', ['class' => 'btn btn-danger btn-xs']);
 $declineForm->end();

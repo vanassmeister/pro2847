@@ -7,6 +7,7 @@ namespace app\components;
 
 use app\models\Payment;
 use app\models\Order;
+use app\models\User;
 use Yii;
 
 /**
@@ -28,7 +29,16 @@ class PaymentProcessor
         $payer = Yii::$app->user->identity;
         $payment->payer_id = $payer->id;
 
-        $recipient = $payment->recipient;
+        $recipient = User::findOne(['name' => $payment->recipientName]);
+        if(!$recipient) {
+            $recipient = new User();
+            $recipient->name = $payment->recipientName;
+            if (!$recipient->save()) {
+                throw new Exception('Невозможно сохранить получателя');
+            }
+        }
+        
+        $payment->recipient_id = $recipient->id;
 
         $transaction = Yii::$app->db->beginTransaction();
         try {
