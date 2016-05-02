@@ -1,6 +1,4 @@
-<?php
-
-namespace app\models;
+<?php namespace app\models;
 
 use yii\behaviors\TimestampBehavior;
 use Yii;
@@ -23,6 +21,11 @@ use Yii;
  */
 class Order extends \yii\db\ActiveRecord
 {
+
+    const STATUS_NEW = 0;
+    const STATUS_PAYED = 1;
+    const STATUS_DECLINED = 2;
+
     /**
      * @inheritdoc
      */
@@ -30,12 +33,13 @@ class Order extends \yii\db\ActiveRecord
     {
         return 'order';
     }
-    
-    public function behaviors() {
+
+    public function behaviors()
+    {
         return [
             TimestampBehavior::className(),
         ];
-    }    
+    }
 
     /**
      * @inheritdoc
@@ -43,12 +47,11 @@ class Order extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['recipient_id', 'payer_id', 'amount'], 'required'],
-            [['recipient_id', 'payer_id', 'status', 'payment_id'], 'integer'],
+            [['payer_id', 'amount'], 'required'],
+            [['payer_id', 'status', 'payment_id'], 'integer'],
             [['amount'], 'number'],
             [['payer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['payer_id' => 'id']],
             [['payment_id'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_id' => 'id']],
-            [['recipient_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['recipient_id' => 'id']],
         ];
     }
 
@@ -59,13 +62,13 @@ class Order extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'recipient_id' => 'Recipient ID',
-            'payer_id' => 'Payer ID',
-            'amount' => 'Amount',
-            'status' => 'Status',
-            'payment_id' => 'Payment ID',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'recipient_id' => 'Получатель',
+            'payer_id' => 'Плательщик',
+            'amount' => 'Сумма',
+            'status' => 'Статус',
+            'payment_id' => 'ID платежа',
+            'created_at' => 'Создан',
+            'updated_at' => 'Изменен',
         ];
     }
 
@@ -91,5 +94,20 @@ class Order extends \yii\db\ActiveRecord
     public function getRecipient()
     {
         return $this->hasOne(User::className(), ['id' => 'recipient_id']);
+    }
+
+    public static function getStatusNames()
+    {
+        return [
+            self::STATUS_NEW => 'Создан',
+            self::STATUS_PAYED => 'Оплачен',
+            self::STATUS_DECLINED => 'Отклонен',
+        ];
+    }
+
+    public function getStatusName()
+    {
+        $names = self::getStatusNames();
+        return isset($names[$this->status]) ? $names[$this->status] : '';
     }
 }

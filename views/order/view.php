@@ -29,13 +29,22 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'recipient_id',
-            'payer_id',
+            [
+                'attribute' => 'recipient.name',
+                'label' => 'Получатель'
+            ],
+            [
+                'attribute' => 'payer.name',
+                'label' => 'Плательщик'
+            ],            
             'amount',
-            'status',
+            [
+                'label' => 'Статус',
+                'value' => $model->getStatusName()
+            ],
             'payment_id',
-            'created_at',
-            'updated_at',
+            'created_at:datetime',
+            'updated_at:datetime',
         ],
     ]) ?>
 
