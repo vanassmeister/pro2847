@@ -26,8 +26,13 @@ AppAsset::register($this);
 
 <div class="wrap">
     <?php
+    
+    $user = !Yii::$app->user->isGuest ? Yii::$app->user->identity : null;
+    
+    $brandLabel =  $user ? $user->name.' '.$user->balance.'$' : '';
+    
     NavBar::begin([
-        'brandLabel' => 'My Company',
+        'brandLabel' => $brandLabel,
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
@@ -36,16 +41,16 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
+            ['label' => 'Пользователи', 'url' => ['/site/index']],
+            ['label' => 'Счета', 'url' => ['/site/orders']],
+            ['label' => 'Платежи', 'url' => ['/site/payments']],
             Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/site/login']]
+                ['label' => 'Вход', 'url' => ['/site/login']]
             ) : (
                 '<li>'
                 . Html::beginForm(['/site/logout'], 'post', ['class' => 'navbar-form'])
                 . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
+                    'Выход (' . Yii::$app->user->identity->name . ')',
                     ['class' => 'btn btn-link']
                 )
                 . Html::endForm()

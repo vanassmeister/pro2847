@@ -91,7 +91,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         return null;
     }
-    
+
     public function getId()
     {
         return $this->id;
@@ -105,5 +105,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function validateAuthKey($authKey)
     {
         return $this->name === $authKey;
-    }    
+    }
+
+    public static function findByUsername($name)
+    {
+        return static::findOne(['name' => $name]);
+    }
 }
