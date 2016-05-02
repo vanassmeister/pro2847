@@ -45,8 +45,8 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
-            'balance' => 'Balance',
+            'name' => 'Имя пользователя',
+            'balance' => 'Баланс',
         ];
     }
 

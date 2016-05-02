@@ -42,8 +42,8 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Пользователи', 'url' => ['/site/index']],
-            ['label' => 'Счета', 'url' => ['/site/orders']],
-            ['label' => 'Платежи', 'url' => ['/site/payments']],
+            ['label' => 'Счета', 'url' => ['/order/index']],
+            ['label' => 'Платежи', 'url' => ['/payment/index']],
             Yii::$app->user->isGuest ? (
                 ['label' => 'Вход', 'url' => ['/site/login']]
             ) : (

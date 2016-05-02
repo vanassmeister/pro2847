@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use yii\behaviors\TimestampBehavior;
 use Yii;
 
 /**
@@ -27,6 +28,12 @@ class Payment extends \yii\db\ActiveRecord
     {
         return 'payment';
     }
+    
+    public function behaviors() {
+        return [
+            TimestampBehavior::className(),
+        ];
+    }     
 
     /**
      * @inheritdoc
@@ -35,7 +42,7 @@ class Payment extends \yii\db\ActiveRecord
     {
         return [
             [['recipient_id', 'payer_id', 'amount'], 'required'],
-            [['recipient_id', 'payer_id', 'created_at', 'updated_at'], 'integer'],
+            [['recipient_id', 'payer_id'], 'integer'],
             [['amount'], 'number'],
             [['payer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['payer_id' => 'id']],
             [['recipient_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['recipient_id' => 'id']],
