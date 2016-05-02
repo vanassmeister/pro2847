@@ -25,10 +25,21 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'recipient_id',
-            'payer_id',
+            [
+                'label' => 'Получатель',
+                'attribute' => 'recipient.name',
+            ],
+            [
+                'label' => 'Плательщик',
+                'attribute' => 'payer.name',
+            ],            
             'amount',
-            'status',
+            [
+                'attribute' => 'status',
+                'value' => function($row) {
+                    return $row->getStatusName();
+                }
+            ],
             // 'payment_id',
             // 'created_at',
             // 'updated_at',

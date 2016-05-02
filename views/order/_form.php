@@ -1,17 +1,14 @@
 <?php
 
 use yii\helpers\Html;
-use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
-use app\models\User;
+use app\components\FormHelper;
 use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Order */
 /* @var $form yii\widgets\ActiveForm */
 
-$payerOptions = ArrayHelper::map(User::find()->orderBy('name')
-    ->where(['<>','id', Yii::$app->user->id])->all(), 'id', 'name');
 ?>
 
 <div class="order-form">
@@ -19,7 +16,7 @@ $payerOptions = ArrayHelper::map(User::find()->orderBy('name')
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'payer_id')->widget(Select2::classname(), [
-        'data' => $payerOptions,
+        'data' => FormHelper::getUserOptions(),
         'language' => 'ru',
         'options' => ['placeholder' => Yii::t('app', 'Выберите плательщика...')],
         'pluginOptions' => [

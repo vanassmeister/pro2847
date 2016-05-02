@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use Exception;
 
 /**
  * PaymentController implements the CRUD actions for Payment model.
@@ -75,45 +76,43 @@ class PaymentController extends Controller
     {
         $model = new Payment();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
-        }
-    }
+        if ($model->load(Yii::$app->request->post())) {
+            
+            $payer = Yii::$app->user->identity;
+            $model->payer_id = $payer->id;            
+            
+            $recipient = $model->recipient;
+            
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                
+                if(!$model->save()) {
+                    throw new Exception('Невозможно сохранить платеж');
+                }
+                
+                $payer->balance -= $model->amount;
+                $recipient->balance += $model->amount;
+                
+                if(!$payer->save(true, ['balance'])) {
+                    throw new Exception('Невозможно сохранить баланс плательщика');
+                }
 
-    /**
-     * Updates an existing Payment model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
-        }
-    }
-
-    /**
-     * Deletes an existing Payment model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+                if(!$recipient->save(true, ['balance'])) {
+                    throw new Exception('Невозможно сохранить баланс получателя');
+                }
+                
+                $transaction->commit();
+                return $this->redirect(['view', 'id' => $model->id]);
+                
+            } catch (Exception $ex) {
+                Yii::error($ex->getMessage());
+                $transaction->rollBack();
+            }
+        } 
+        
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
     /**
