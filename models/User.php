@@ -32,7 +32,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         return [
             [['name'], 'required'],
-            [['balance'], 'integer'],
+            [['balance'], 'number'],
             [['name'], 'string', 'max' => 32],
             [['name'], 'unique'],
         ];

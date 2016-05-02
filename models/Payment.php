@@ -22,6 +22,8 @@ use Yii;
 class Payment extends \yii\db\ActiveRecord
 {
     
+    const SCENARIO_BY_NAME = 'byName';
+    
     public $recipientName;
     
     /**
@@ -44,7 +46,8 @@ class Payment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['recipientName', 'amount'], 'required'],
+            [['amount'], 'required'],
+            [['recipientName'], 'required', 'on' => self::SCENARIO_BY_NAME],
             [['recipientName'], 'string', 'max' => 32],            
             [['recipient_id', 'payer_id'], 'integer'],
             [['amount'], 'number'],

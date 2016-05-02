@@ -76,7 +76,8 @@ class PaymentController extends Controller
     public function actionCreate()
     {
         $model = new Payment();
-
+        $model->setScenario(Payment::SCENARIO_BY_NAME);
+        
         if ($model->load(Yii::$app->request->post()) && PaymentProcessor::processPayment($model)) {
             $this->redirect(['view', 'id' => $model->id]);
         } 

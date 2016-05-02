@@ -8,6 +8,7 @@ namespace app\components;
 use app\models\Payment;
 use app\models\Order;
 use app\models\User;
+use Exception;
 use Yii;
 
 /**
@@ -29,7 +30,12 @@ class PaymentProcessor
         $payer = Yii::$app->user->identity;
         $payment->payer_id = $payer->id;
 
-        $recipient = User::findOne(['name' => $payment->recipientName]);
+        if($payment->recipient_id) {
+            $recipient = User::findOne($payment->recipient_id);
+        } else {
+            $recipient = User::findOne(['name' => $payment->recipientName]);
+        }
+        
         if(!$recipient) {
             $recipient = new User();
             $recipient->name = $payment->recipientName;
@@ -44,7 +50,7 @@ class PaymentProcessor
         try {
 
             if (!$payment->save()) {
-                throw new Exception('Невозможно сохранить платеж');
+                throw new Exception('Невозможно сохранить платеж '.  var_export($payment->getErrors(), true));
             }
 
             $payer->balance -= $payment->amount;
